@@ -6,10 +6,10 @@
 #include "SmartThing.h"
 
 // Pins
-#define MOTOR_FIRST_PIN 26
-#define MOTOR_SECOND_PIN 25
-#define POT_PIN 36
-#define LIGHT_SENSOR_PIN 35
+#define MOTOR_FIRST_PIN 27
+#define MOTOR_SECOND_PIN 26
+#define POT_PIN 32
+#define LIGHT_SENSOR_PIN 39
 
 #define AUTO_MODE_STATE "automode"
 #define DISABLE_AUTO_MODE "disable_auto"
@@ -76,7 +76,6 @@ void loop() {
         }
         LOGGER.statistics();
     }
-    delay(500);
 }
 
 void setupRestHandlers() {

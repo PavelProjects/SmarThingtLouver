@@ -62,6 +62,10 @@ class LouverController {
         uint16_t getMotorPosition();
         const char * getPosition();
 
+        MotorController * getMotorController() {
+            return &_motorController;
+        }
+
         bool open();
         bool close();
         bool middle();
