@@ -133,24 +133,16 @@ void registerSensors() {
     SmartThing.registerAnalogSensor("light", LIGHT_SENSOR_PIN);
     SmartThing.registerSensor("position", []() {return controller.getMotorPosition();});
 
-    SmartThing.registerDigitalSensor("button", 12);
+    SmartThing.registerDigitalSensor("wipe_button", WIPE_BUTTON_PIN);
 }
 
 void addCallbacks() {
     SmartThing.getCallbacksManager()->addDeviceStateCallback("automode", [](String * value) {
         LOGGER.info("main", "Automode callback called. New value %s", *value);
         JsonObject state = STSettings.getState();
-        state[AUTO_MODE_STATE] = value->c_str();
+        state[AUTO_MODE_STATE] = value->equals("true");
         STSettings.save();
     });
-    SmartThing.getCallbacksManager()->addSensorCallback("button", [](int16_t * value) {
-        LOGGER.debug("main", "Digital sensor value changed to %u", *value);
-        if (controller.isAutoModeEnabled()) {
-            controller.disableAutoMode();
-        } else {
-            controller.enableAutoMode();
-        }
-    }, 1);
 }
 
 void addActionsHandlers() {
