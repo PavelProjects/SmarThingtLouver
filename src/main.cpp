@@ -5,7 +5,7 @@
 
 #include "LouverController.h"
 
-#define BUTTON_PIN 14
+#define BUTTON_PIN 12
 
 #define MOTOR_FIRST_PIN 27
 #define MOTOR_SECOND_PIN 26
@@ -93,6 +93,7 @@ void addActions() {
 void addSensors() {
   SmartThing.addDigitalSensor("button", BUTTON_PIN);
   SmartThing.addAnalogSensor("light", LIGHT_SENSOR_PIN);
+  SmartThing.addAnalogSensor("position", POT_PIN);
 }
 void addStates() {
   SmartThing.addDeviceState("position", []() {
@@ -116,14 +117,13 @@ void addConfigEntries() {
 void addHooks() {
   Hook::LambdaHook<int16_t> * hook = new Hook::LambdaHook<int16_t>(
     [](int16_t &value) {
-      if (value == 0) {
-        if (controller.isAutoModeEnabled()) {
-          controller.disableAutoMode();
-        } else {
-          controller.enableAutoMode();
-        }
-        LOGGER.statistics();
+      LOGGER.info("main", "Hook called");
+      if (controller.isAutoModeEnabled()) {
+        controller.disableAutoMode();
+      } else {
+        controller.enableAutoMode();
       }
+      LOGGER.statistics();
     },
     true
   );

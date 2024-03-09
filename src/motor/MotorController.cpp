@@ -39,10 +39,9 @@ bool MotorController::setPosition(int turnToPosition) {
 
     LOGGER.debug(
         "motor", 
-        "Trying to change position from %u to %u [accuracy=%u]", 
+        "Trying to change position from %u to %u", 
         currentState, 
-        turnToPosition, 
-        _accuracy
+        turnToPosition
     );
 
     long started = millis();
@@ -51,7 +50,14 @@ bool MotorController::setPosition(int turnToPosition) {
     while (abs(currentState - turnToPosition) > _accuracy && millis() - started < TIMEOUT) {
         currentState = getPosition();
         dt = currentState - turnToPosition;
-        setDirection(dt);
+        delay(10);
+        if (dt <= 0) {
+            analogWrite(_motorFirstPin, 255);
+            analogWrite(_motorSecondPin, LOW);
+        } else {
+            analogWrite(_motorFirstPin, LOW);
+            analogWrite(_motorSecondPin, 255);
+        }
     }
     LOGGER.debug("motor", "%d - %d = %d", currentState, turnToPosition, dt);
     stop();
@@ -60,16 +66,6 @@ bool MotorController::setPosition(int turnToPosition) {
         LOGGER.error("motor", "timeout");
     }
     return res;
-}
-
-void MotorController::setDirection(int dt) {
-    if (dt <= 0) {
-        analogWrite(_motorFirstPin, 255);
-        analogWrite(_motorSecondPin, LOW);
-    } else {
-        analogWrite(_motorFirstPin, LOW);
-        analogWrite(_motorSecondPin, 255);
-    }
 }
 
 void MotorController::setAngle(uint8_t angle) {
