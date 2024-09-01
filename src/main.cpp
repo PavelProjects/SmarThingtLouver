@@ -49,7 +49,6 @@ void setup() {
     }
     LOGGER.info("main", "SmartThing successfully initialized");
     controller.init(MOTOR_FIRST_PIN, MOTOR_SECOND_PIN, POT_PIN, LIGHT_SENSOR_PIN);
-    controller.addLedIndicator(SmartThing.getLed());
     LOGGER.info("main", "Controller created");
     processConfig();
     LOGGER.info("main", "Config proceed");
@@ -115,7 +114,7 @@ void addConfigEntries() {
 }
 
 void addHooks() {
-  Hook::LambdaHook<int16_t> * hook = new Hook::LambdaHook<int16_t>(
+  Hook::LambdaHook<Hook::SensorHook, int16_t> * hook = new Hook::LambdaHook<Hook::SensorHook, int16_t>(
     [](int16_t &value) {
       LOGGER.info("main", "Hook called");
       if (controller.isAutoModeEnabled()) {
@@ -123,12 +122,11 @@ void addHooks() {
       } else {
         controller.enableAutoMode();
       }
-      LOGGER.statistics();
     },
     true
   );
-  hook->setTriggerValue(1);
-  hook->setTriggerDisabled(false);
+  hook->setThreshold(0);
+  hook->disableTrigger();
 
   HooksManager.addHook(SmartThing.getSensor("button"), hook);
 }

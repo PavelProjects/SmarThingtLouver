@@ -18,14 +18,11 @@ void LouverController::init( uint8_t motorFirstPin,
                                     uint8_t lightSensorPin) {
     _motorController = MotorController(motorFirstPin, motorSecondPin, potPin);
     _lightSensorPin = lightSensorPin;
+    pinMode(LED_PIN, OUTPUT);
 }
 
 void LouverController::setMotorAccuracy(uint16_t accuracy) {
     _motorController.setAccuracy(accuracy);
-}
-
-void LouverController::addLedIndicator(LedIndicator * led) {
-    _led = led;
 }
 
 void LouverController::setLightValues(
@@ -135,10 +132,8 @@ void LouverController::restartAutoMode() {
 bool LouverController::enableAutoMode() {
     if (!isAutoModeEnabled()) {
         createMonitorTask();
-        if (_led != NULL) {
-            _led->on();
-        }
     }
+    digitalWrite(LED_PIN, HIGH);
     LOGGER.info(LOUVER_CONTROLLER_TAG, "Automode enabled");
     return true;
 }
@@ -146,10 +141,8 @@ bool LouverController::enableAutoMode() {
 bool LouverController::disableAutoMode() {
     if (isAutoModeEnabled()) {
         deleteMonitorTask();
-        if (_led != NULL) {
-            _led->off();
-        }
     }
+    digitalWrite(LED_PIN, LOW);
     LOGGER.info(LOUVER_CONTROLLER_TAG, "Automode disabled");
     return true;
 }
