@@ -70,35 +70,35 @@ void loop() {
 }
 
 void addActions() {
-  SmartThing.addActionHandler(ENABLE_AUTO_MODE, "Enable automode", []() {
+  ActionsManager.add(ENABLE_AUTO_MODE, "Enable automode", []() {
     return ActionResult(controller.enableAutoMode());
   });
-  SmartThing.addActionHandler(DISABLE_AUTO_MODE, "Disable automode", []() {
+  ActionsManager.add(DISABLE_AUTO_MODE, "Disable automode", []() {
     return ActionResult(controller.disableAutoMode());
   });
-  SmartThing.addActionHandler(OPEN, "Open", []() {
+  ActionsManager.add(OPEN, "Open", []() {
     return ActionResult(controller.open());
   });
-  SmartThing.addActionHandler(CLOSE, "Close", []() {
+  ActionsManager.add(CLOSE, "Close", []() {
     return ActionResult(controller.close());
   });
-  SmartThing.addActionHandler(MIDDLE, "Middle", []() {
+  ActionsManager.add(MIDDLE, "Middle", []() {
     return ActionResult(controller.middle());
   });
-  SmartThing.addActionHandler(BRIGHT, "Bright", []() {
+  ActionsManager.add(BRIGHT, "Bright", []() {
     return ActionResult(controller.bright());
   });
 }
 void addSensors() {
-  SmartThing.addDigitalSensor("button", BUTTON_PIN);
-  SmartThing.addAnalogSensor("light", LIGHT_SENSOR_PIN);
-  SmartThing.addAnalogSensor("position", POT_PIN);
+  ObservablesManager.addDigitalSensor("button", BUTTON_PIN);
+  ObservablesManager.addAnalogSensor("light", LIGHT_SENSOR_PIN);
+  ObservablesManager.addAnalogSensor("position", POT_PIN);
 }
 void addStates() {
-  SmartThing.addDeviceState("position", []() {
+  ObservablesManager.addDeviceState("position", []() {
     return controller.getPosition();
   });
-  SmartThing.addDeviceState("automode", []() {
+  ObservablesManager.addDeviceState("automode", []() {
     if (controller.isAutoModeEnabled()) {
       return "true";
     }
@@ -106,15 +106,15 @@ void addStates() {
   });
 }
 void addConfigEntries() {
-  SmartThing.addConfigEntry(DELAY_SETTING, "Automode update delay", "number");
-  SmartThing.addConfigEntry(ACCURACY_SETTING, "Motor accuracy", "number");
-  SmartThing.addConfigEntry(CLOSE_SETTING, "Light close value", "number");
-  SmartThing.addConfigEntry(OPEN_SETTING, "Light open value", "number");
-  SmartThing.addConfigEntry(BRIGHT_SETTING, "Light bright value", "number");
+  SettingsRepository.addConfigEntry(DELAY_SETTING, "Automode update delay", CONFIG_INTEGER);
+  SettingsRepository.addConfigEntry(ACCURACY_SETTING, "Motor accuracy", CONFIG_INTEGER);
+  SettingsRepository.addConfigEntry(CLOSE_SETTING, "Light close value", CONFIG_INTEGER);
+  SettingsRepository.addConfigEntry(OPEN_SETTING, "Light open value",CONFIG_INTEGER);
+  SettingsRepository.addConfigEntry(BRIGHT_SETTING, "Light bright value", CONFIG_INTEGER);
 }
 
 void addHooks() {
-  Hook::LambdaHook<Hook::SensorHook, int16_t> * hook = new Hook::LambdaHook<Hook::SensorHook, int16_t>(
+  LambdaHook<SensorHook, int16_t> * hook = new LambdaHook<SensorHook, int16_t>(
     [](int16_t &value) {
       LOGGER.info("main", "Hook called");
       if (controller.isAutoModeEnabled()) {
@@ -128,7 +128,7 @@ void addHooks() {
   hook->setThreshold(0);
   hook->disableTrigger();
 
-  HooksManager.addHook(SmartThing.getSensor("button"), hook);
+  HooksManager.addHook(ObservablesManager.getSensor("button"), hook);
 }
 
 void setupRestHandlers() {
@@ -137,7 +137,7 @@ void setupRestHandlers() {
   });
 }
 void processConfig() {
-  JsonObject config = STSettings.getConfig();
+  JsonDocument config = SettingsRepository.getConfig();
   int lightClose = config[CLOSE_SETTING];
   int lightOpen = config[OPEN_SETTING];
   int lightBright = config[BRIGHT_SETTING];
